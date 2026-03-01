@@ -1,7 +1,7 @@
 require("dotenv").config();
-const pool = require('./config/db');
 const express = require("express");
 const cors = require("cors");
+const pool = require("./config/db"); // make sure this file exports your PostgreSQL pool
 
 const app = express();
 
@@ -12,20 +12,21 @@ app.use(express.json());
 // Import routes
 const complianceRoutes = require("./routes/complianceRoutes");
 
-// Use routes
+// Use routes with prefix /api/compliance
 app.use("/api/compliance", complianceRoutes);
 
-// Test Route
+// Test server route
 app.get("/", (req, res) => {
-    res.send("PharmaComply360 Backend is Running 🚀");
+  res.send("PharmaComply360 Backend is Running 🚀");
 });
 
-// Server Port
+// Connect to DB and start server
 const PORT = process.env.PORT || 5000;
+
 pool.connect()
   .then(() => console.log("PostgreSQL Connected ✅"))
   .catch(err => console.error("DB Connection Error ❌", err));
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
