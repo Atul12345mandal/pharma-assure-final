@@ -15,12 +15,10 @@ const getComplianceData = async (req, res) => {
 const addComplianceData = async (req, res) => {
   try {
     const { name, status } = req.body;
-
     const result = await pool.query(
       "INSERT INTO compliance (name, status) VALUES ($1, $2) RETURNING *;",
       [name, status]
     );
-
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error(error);

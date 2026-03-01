@@ -1,57 +1,38 @@
-const API_URL = "http://localhost:5000";
+const API_URL = "http://localhost:5000/api/compliance";
 
-// Function to load compliance data
-async function loadCompliance() {
-    try {
-        const response = await fetch(`${API_URL}/compliance`);
-        const data = await response.json();
-
-        const tbody = document.querySelector("#compliance-table tbody");
-        tbody.innerHTML = ""; // Clear table before adding
-
-        data.forEach(record => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${record.id}</td>
-                <td>${record.name}</td>
-                <td>${record.status}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } catch (err) {
-        console.error("Error fetching compliance data:", err);
-    }
+// Fetch compliance data
+async function fetchCompliance() {
+  const res = await fetch(API_URL);
+  const data = await res.json();
+  const list = document.getElementById("compliance-list");
+  list.innerHTML = "";
+  data.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = `${item.name} - ${item.status}`;
+    list.appendChild(li);
+  });
 }
 
-// Function to add new compliance
-async function addCompliance(event) {
-    event.preventDefault();
+// Add new compliance record
+document.getElementById("compliance-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = document.getElementById("name").value;
+  const status = document.getElementById("status").value;
 
-    const name = document.querySelector("#name").value;
-    const status = document.querySelector("#status").value;
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, status })
+  });
 
-    try {
-        const response = await fetch(`${API_URL}/compliance`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, status })
-        });
+  if (res.ok) {
+    document.getElementById("name").value = "";
+    document.getElementById("status").value = "";
+    fetchCompliance(); // refresh list
+  } else {
+    alert("Error adding compliance record");
+  }
+});
 
-        const result = await response.json();
-        console.log(result.message);
-
-        // Reload the table
-        loadCompliance();
-
-        // Clear form
-        document.querySelector("#add-form").reset();
-    } catch (err) {
-        console.error("Error adding compliance:", err);
-    }
-}
-
-// Event listener for form submission
-document.querySelector("#add-form").addEventListener("submit", addCompliance);
-
-// Load compliance data on page load
-loadCompliance();
+// Initial fetch
+fetchCompliance();

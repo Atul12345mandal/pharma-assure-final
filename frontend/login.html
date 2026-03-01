@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PharmaComply360 Login</title>
+</head>
+<body>
+    <h2>Login to PharmaComply360</h2>
+    <form id="loginForm">
+        Email: <input type="email" id="email" required><br><br>
+        Password: <input type="password" id="password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <h3 id="message"></h3>
+
+    <script>
+        const loginForm = document.getElementById("loginForm");
+        const message = document.getElementById("message");
+
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const res = await fetch("http://localhost:5000/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Save token in localStorage
+                    localStorage.setItem("token", data.token);
+                    message.style.color = "green";
+                    message.innerText = "Login successful! Token saved.";
+                } else {
+                    message.style.color = "red";
+                    message.innerText = data.message || "Login failed";
+                }
+            } catch (err) {
+                message.style.color = "red";
+                message.innerText = "Error connecting to server";
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>

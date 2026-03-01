@@ -1,12 +1,10 @@
-// routes/complianceRoutes.js
 const express = require("express");
 const router = express.Router();
 const { getComplianceData, addComplianceData } = require("../controllers/complianceController");
+const { protect } = require("../middleware/authMiddleware"); // <- import
 
-// Route to get all compliance data
-router.get("/", getComplianceData);
-
-// Route to add a new compliance record
-router.post("/", addComplianceData);
+// Protect routes so only logged-in users can access
+router.get("/", protect, getComplianceData);
+router.post("/", protect, addComplianceData);
 
 module.exports = router;
